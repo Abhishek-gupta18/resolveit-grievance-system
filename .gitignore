@@ -1,0 +1,13 @@
+# Node
+node_modules/
+frontend/node_modules/
+
+# Maven / Spring Boot
+target/
+
+# IDE
+.idea/
+.vscode/
+
+# environment
+.env

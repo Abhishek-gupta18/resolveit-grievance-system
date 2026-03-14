@@ -1,0 +1,114 @@
+.staff-page {
+  min-height: 100vh;
+  background: #f4f8ff;
+  color: #1f2937;
+  padding: 24px;
+}
+
+.staff-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.staff-header h1 {
+  margin: 0;
+}
+
+.staff-logout,
+.staff-btn {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.staff-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.staff-card {
+  background: #fff;
+  border: 1px solid #dbe4ff;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.staff-card h3 {
+  margin: 8px 0;
+  font-size: 0.95rem;
+}
+
+.staff-card p {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.staff-section {
+  background: #fff;
+  border: 1px solid #dbe4ff;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.staff-table-wrap {
+  overflow-x: auto;
+}
+
+.staff-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.staff-table th,
+.staff-table td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 10px;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.staff-action-group {
+  display: flex;
+  gap: 8px;
+}
+
+.staff-action-btn {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.staff-action-btn.resolve {
+  border-color: #10b981;
+  color: #047857;
+}
+
+.staff-action-btn.escalate {
+  border-color: #f59e0b;
+  color: #b45309;
+}
+
+.staff-action-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.staff-loading,
+.staff-error {
+  text-align: center;
+  margin-top: 100px;
+}

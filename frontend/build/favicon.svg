@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Wolf emblem">
+  <defs>
+    <linearGradient id="r" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff3b3b"/>
+      <stop offset="1" stop-color="#b10000"/>
+    </linearGradient>
+    <linearGradient id="m" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2c2c36"/>
+      <stop offset="1" stop-color="#0f0f14"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" fill="#06060a"/>
+  <path d="M24 18l16 8 8 18-14-7-12-19zm80 0l-16 8-8 18 14-7 10-19z" fill="url(#r)"/>
+  <path d="M64 18l22 12 10 26-7 37-25 22-25-22-7-37 10-26z" fill="url(#m)" stroke="#3e3e46" stroke-width="2"/>
+  <path d="M40 56l10-8 8 4-10 14zm48 0l-10-8-8 4 10 14z" fill="#ff4747"/>
+  <path d="M64 48l8 16-8 22-8-22z" fill="#d9d9e4" opacity="0.95"/>
+  <path d="M50 90l14 16 14-16-14-8z" fill="url(#r)"/>
+  <path d="M56 74c3-3 13-3 16 0" stroke="#ff5a5a" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg>
