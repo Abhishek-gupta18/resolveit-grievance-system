@@ -1,4 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 import { getCurrentUser, logout } from '../services/authService';
 import {
   addSampleStaffAndAssignComplaints,
@@ -63,6 +66,11 @@ const COMPLAINT_CATEGORY_OPTIONS = [
 
 const ATTENDANCE_STATUS_OPTIONS = ['present', 'absent', 'on_leave'];
 const REPORT_PERIOD_OPTIONS = ['7d', '30d', '90d', 'all'];
+const EXPORT_FORMAT_OPTIONS = [
+  { value: 'csv', label: 'CSV' },
+  { value: 'xlsx', label: 'Excel' },
+  { value: 'pdf', label: 'PDF' },
+];
 
 const safeJsonParse = (value, fallback) => {
   if (!value) {
@@ -231,14 +239,63 @@ const downloadCsv = (fileName, rows) => {
   URL.revokeObjectURL(url);
 };
 
-const downloadJson = (fileName, payload) => {
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = fileName;
-  link.click();
-  URL.revokeObjectURL(url);
+const downloadExcel = (fileName, sheetName, rows) => {
+  const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.aoa_to_sheet(rows);
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+  XLSX.writeFile(workbook, fileName);
+};
+
+const downloadPdf = (fileName, title, rows) => {
+  const columnCount = rows[0]?.length || 0;
+  const doc = new jsPDF({
+    orientation: columnCount > 6 ? 'landscape' : 'portrait',
+    unit: 'pt',
+    format: 'a4',
+  });
+
+  doc.setFontSize(16);
+  doc.text(title, 40, 40);
+  autoTable(doc, {
+    startY: 56,
+    head: [rows[0]],
+    body: rows.slice(1),
+    styles: {
+      fontSize: columnCount > 8 ? 7 : 8,
+      cellPadding: 4,
+      overflow: 'linebreak',
+    },
+    headStyles: {
+      fillColor: [37, 99, 235],
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+    },
+    alternateRowStyles: {
+      fillColor: [248, 250, 252],
+    },
+    margin: { top: 56, right: 24, bottom: 24, left: 24 },
+    theme: 'grid',
+  });
+  doc.save(fileName);
+};
+
+const exportRows = ({ fileName, sheetName, title, rows }, format) => {
+  if (!rows || rows.length <= 1) {
+    return false;
+  }
+
+  if (format === 'xlsx') {
+    downloadExcel(fileName.replace(/\.csv$/i, '.xlsx').replace(/\.pdf$/i, '.xlsx'), sheetName, rows);
+    return true;
+  }
+
+  if (format === 'pdf') {
+    downloadPdf(fileName.replace(/\.csv$/i, '.pdf').replace(/\.xlsx$/i, '.pdf'), title, rows);
+    return true;
+  }
+
+  downloadCsv(fileName.replace(/\.xlsx$/i, '.csv').replace(/\.pdf$/i, '.csv'), rows);
+  return true;
 };
 
 const getPeriodCutoff = (period) => {
@@ -304,6 +361,7 @@ const ADashboard = ({ onNavigateLanding }) => {
   }));
   const [notificationState, setNotificationState] = useState(() => safeJsonParse(localStorage.getItem(ADMIN_NOTIFICATION_KEY), {}));
   const [reportPeriod, setReportPeriod] = useState('30d');
+  const [sectionExportFormat, setSectionExportFormat] = useState('csv');
 
   useEffect(() => {
     localStorage.setItem(ADMIN_SETTINGS_KEY, JSON.stringify(settings));
@@ -901,10 +959,10 @@ const ADashboard = ({ onNavigateLanding }) => {
     }));
   }, [reportComplaints]);
 
-  const exportComplaintReport = () => {
+  const exportComplaintReport = useCallback((format = 'csv', dataset = filteredComplaints, exportTitle = 'Active Complaints', filePrefix = 'admin-complaints') => {
     const rows = [
       ['Complaint Code', 'User', 'Email', 'Category', 'Priority', 'Status', 'Assignee', 'Created At', 'Resolved At', 'Admin Review'],
-      ...filteredComplaints.map((complaint) => [
+      ...dataset.map((complaint) => [
         complaint.complaintCode || `#${complaint.id}`,
         complaint.userName || 'Anonymous',
         complaint.userEmail || 'N/A',
@@ -917,29 +975,43 @@ const ADashboard = ({ onNavigateLanding }) => {
         complaint.adminReview || '',
       ]),
     ];
-    downloadCsv(`admin-complaints-${toDateKey()}.csv`, rows);
-  };
 
-  const exportStaffReport = () => {
+    return exportRows({
+      fileName: `${filePrefix}-${toDateKey()}.${format === 'pdf' ? 'pdf' : format === 'xlsx' ? 'xlsx' : 'csv'}`,
+      sheetName: 'Complaints',
+      title: exportTitle,
+      rows,
+    }, format);
+  }, [filteredComplaints]);
+
+  const exportStaffReport = useCallback((format = 'csv') => {
     const rows = [
-      ['Name', 'Email', 'Role', 'Active', 'Handled Complaints', 'Resolved Complaints', 'Utilization %', 'Last Action'],
+      ['Name', 'Email', 'Role', 'Rank', 'Active', 'Handled Complaints', 'Resolved Complaints', 'Assigned Complaints', 'Utilization %', 'Last Action'],
       ...workerPerformance.map((worker) => [
         worker.name,
         worker.email,
         worker.role,
+        worker.rank || '-',
         worker.isActive ? 'Yes' : 'No',
         worker.complaints,
         worker.completed,
+        worker.assigned,
         worker.utilization,
         formatDateTime(worker.lastActionAt),
       ]),
     ];
-    downloadCsv(`admin-staff-${toDateKey()}.csv`, rows);
-  };
 
-  const exportAttendanceReport = () => {
+    return exportRows({
+      fileName: `admin-staff-${toDateKey()}.${format === 'pdf' ? 'pdf' : format === 'xlsx' ? 'xlsx' : 'csv'}`,
+      sheetName: 'Staff',
+      title: 'Staff Management',
+      rows,
+    }, format);
+  }, [workerPerformance]);
+
+  const exportAttendanceReport = useCallback((format = 'csv') => {
     const rows = [
-      ['Date', 'Staff', 'Email', 'Status', 'Check-in', 'Check-out'],
+      ['Date', 'Staff', 'Email', 'Role', 'Status', 'Check-in', 'Check-out', 'Duration'],
       ...workerPerformance.map((worker) => {
         const record = attendanceForDate[worker.id] || {};
         const status = record.status || (worker.isActive ? 'present' : 'absent');
@@ -947,47 +1019,184 @@ const ADashboard = ({ onNavigateLanding }) => {
           attendanceDate,
           worker.name,
           worker.email,
+          worker.role,
           getStatusLabel(status),
           record.checkIn || '-',
           record.checkOut || '-',
+          getAttendanceDuration(record.checkIn, record.checkOut),
         ];
       }),
     ];
-    downloadCsv(`admin-attendance-${attendanceDate}.csv`, rows);
-  };
 
-  const exportSummaryReport = () => {
-    downloadJson(`admin-summary-${toDateKey()}.json`, {
-      exportedAt: new Date().toISOString(),
-      complaintStats,
-      attendanceSummary,
-      settings,
-      complaintsInScope: reportComplaints.length,
-      staffInScope: workerPerformance.length,
-      categories: categoryData,
-      priorityBreakdown: analyticsPriorityData,
-      statusBreakdown: analyticsStatusData,
-    });
-  };
+    return exportRows({
+      fileName: `admin-attendance-${attendanceDate}.${format === 'pdf' ? 'pdf' : format === 'xlsx' ? 'xlsx' : 'csv'}`,
+      sheetName: 'Attendance',
+      title: `Attendance Snapshot ${attendanceDate}`,
+      rows,
+    }, format);
+  }, [attendanceDate, attendanceForDate, workerPerformance]);
 
-  const exportResolvedComplaintReport = () => {
+  const exportSummaryReport = useCallback((format = 'csv', exportTitle = 'Admin Summary', filePrefix = 'admin-summary') => {
     const rows = [
-      ['Complaint Code', 'User', 'Email', 'Category', 'Priority', 'Status', 'Assignee', 'Created At', 'Resolved At', 'Admin Review'],
-      ...resolvedComplaints.map((complaint) => [
+      ['Area', 'Metric', 'Value'],
+      ['Complaints', 'Total Complaints', complaintStats.totalComplaints],
+      ['Complaints', 'Completed Today', complaintStats.completedToday],
+      ['Complaints', 'In Progress', complaintStats.inProgressToday],
+      ['Complaints', 'Open or Pending', complaintStats.pendingToday],
+      ['Complaints', 'Urgent Pending', complaintStats.urgentPending],
+      ['Complaints', 'Resolution Rate', `${complaintStats.resolvedRate}%`],
+      ['Complaints', 'Average Resolution Time', complaintStats.averageTime],
+      ['Attendance', 'Present', attendanceSummary.present],
+      ['Attendance', 'Absent', attendanceSummary.absent],
+      ['Attendance', 'On Leave', attendanceSummary.onLeave],
+      ['Attendance', 'Total Staff', attendanceSummary.total],
+      ['Reports', 'Complaints In Scope', reportComplaints.length],
+      ['Reports', 'Tracked Staff', workerPerformance.length],
+      ['Settings', 'Max Complaints Per Worker', settings.maxComplaintsPerWorker],
+      ['Settings', 'Resolution Target Hours', settings.resolutionTargetHours],
+      ['Settings', 'Two Factor Enabled', settings.enableTwoFactor ? 'Yes' : 'No'],
+      ['Settings', 'Audit Log Enabled', settings.enableAuditLog ? 'Yes' : 'No'],
+      ['Settings', 'Email Notifications', settings.emailNotifications ? 'Yes' : 'No'],
+      ['Settings', 'SMS Critical Alerts', settings.smsCriticalAlerts ? 'Yes' : 'No'],
+    ];
+
+    return exportRows({
+      fileName: `${filePrefix}-${toDateKey()}.${format === 'pdf' ? 'pdf' : format === 'xlsx' ? 'xlsx' : 'csv'}`,
+      sheetName: 'Summary',
+      title: exportTitle,
+      rows,
+    }, format);
+  }, [attendanceSummary, complaintStats, reportComplaints.length, settings, workerPerformance.length]);
+
+  const exportResolvedComplaintReport = useCallback((format = 'csv') => {
+    return exportComplaintReport(format, resolvedComplaints, 'Resolved Complaints', 'admin-resolved-complaints');
+  }, [exportComplaintReport, resolvedComplaints]);
+
+  const exportAssignmentReport = useCallback((format = 'csv') => {
+    const rows = [
+      ['Complaint Code', 'User', 'Category', 'Priority', 'Status', 'Current Assignee', 'Eligible Handler Count', 'Created At'],
+      ...assignSectionComplaints.map((complaint) => [
         complaint.complaintCode || `#${complaint.id}`,
         complaint.userName || 'Anonymous',
-        complaint.userEmail || 'N/A',
         getComplaintCategoryLabel(complaint.category),
         (complaint.urgency || 'normal').toUpperCase(),
         getStatusLabel(complaint.status),
         complaint.assignedStaffName || 'Unassigned',
+        getAssignableHandlersForComplaint(complaint).length,
         formatDateTime(complaint.createdAt),
-        formatDateTime(complaint.resolvedAt),
-        complaint.adminReview || '',
       ]),
     ];
-    downloadCsv(`admin-resolved-complaints-${toDateKey()}.csv`, rows);
-  };
+
+    return exportRows({
+      fileName: `admin-assignments-${toDateKey()}.${format === 'pdf' ? 'pdf' : format === 'xlsx' ? 'xlsx' : 'csv'}`,
+      sheetName: 'Assignments',
+      title: 'Complaint Assignments',
+      rows,
+    }, format);
+  }, [assignSectionComplaints, getAssignableHandlersForComplaint]);
+
+  const exportAnalyticsReport = useCallback((format = 'csv') => {
+    const total = reportComplaints.length || 1;
+    const rows = [
+      ['Group', 'Label', 'Count', 'Share'],
+      ...categoryData.map((item) => ['Category', getStatusLabel(item.name), item.count, `${Math.round((item.count / total) * 100)}%`]),
+      ...analyticsPriorityData.map((item) => ['Priority', getStatusLabel(item.label), item.count, `${Math.round((item.count / total) * 100)}%`]),
+      ...analyticsStatusData.map((item) => ['Status', getStatusLabel(item.label), item.count, `${Math.round((item.count / total) * 100)}%`]),
+    ];
+
+    return exportRows({
+      fileName: `admin-analytics-${toDateKey()}.${format === 'pdf' ? 'pdf' : format === 'xlsx' ? 'xlsx' : 'csv'}`,
+      sheetName: 'Analytics',
+      title: 'Advanced Analytics',
+      rows,
+    }, format);
+  }, [analyticsPriorityData, analyticsStatusData, categoryData, reportComplaints.length]);
+
+  const exportNotificationsReport = useCallback((format = 'csv') => {
+    const rows = [
+      ['Alert Id', 'Level', 'Message', 'Dismissed'],
+      ...notifications.map((item) => [item.id, item.level, item.message, notificationState[item.id] ? 'Yes' : 'No']),
+    ];
+
+    return exportRows({
+      fileName: `admin-alerts-${toDateKey()}.${format === 'pdf' ? 'pdf' : format === 'xlsx' ? 'xlsx' : 'csv'}`,
+      sheetName: 'Alerts',
+      title: 'System Alerts',
+      rows,
+    }, format);
+  }, [notificationState, notifications]);
+
+  const exportSettingsReport = useCallback((format = 'csv') => {
+    const rows = [
+      ['Setting', 'Value'],
+      ['Max Complaints Per Worker', settings.maxComplaintsPerWorker],
+      ['Resolution Target Hours', settings.resolutionTargetHours],
+      ['Two Factor Enabled', settings.enableTwoFactor ? 'Yes' : 'No'],
+      ['Audit Log Enabled', settings.enableAuditLog ? 'Yes' : 'No'],
+      ['Email Notifications', settings.emailNotifications ? 'Yes' : 'No'],
+      ['SMS Critical Alerts', settings.smsCriticalAlerts ? 'Yes' : 'No'],
+    ];
+
+    return exportRows({
+      fileName: `admin-settings-${toDateKey()}.${format === 'pdf' ? 'pdf' : format === 'xlsx' ? 'xlsx' : 'csv'}`,
+      sheetName: 'Settings',
+      title: 'Admin Settings',
+      rows,
+    }, format);
+  }, [settings]);
+
+  const exportCurrentSection = useCallback(() => {
+    const handlers = {
+      home: () => exportSummaryReport(sectionExportFormat, 'Dashboard Overview', 'admin-dashboard-overview'),
+      complaints: () => exportComplaintReport(sectionExportFormat),
+      resolved: () => exportResolvedComplaintReport(sectionExportFormat),
+      assign: () => exportAssignmentReport(sectionExportFormat),
+      workers: () => exportStaffReport(sectionExportFormat),
+      attendance: () => exportAttendanceReport(sectionExportFormat),
+      reports: () => exportSummaryReport(sectionExportFormat),
+      analytics: () => exportAnalyticsReport(sectionExportFormat),
+      notifications: () => exportNotificationsReport(sectionExportFormat),
+      settings: () => exportSettingsReport(sectionExportFormat),
+    };
+
+    const sectionTitles = {
+      home: 'dashboard overview',
+      complaints: 'complaints',
+      resolved: 'resolved complaints',
+      assign: 'assignments',
+      workers: 'staff data',
+      attendance: 'attendance data',
+      reports: 'summary report',
+      analytics: 'analytics',
+      notifications: 'system alerts',
+      settings: 'settings',
+    };
+
+    const exportHandler = handlers[activeSection];
+    if (!exportHandler) {
+      setAdminMessage('This section does not have exportable data.');
+      return;
+    }
+
+    const exported = exportHandler();
+    setAdminMessage(
+      exported
+        ? `Exported ${sectionTitles[activeSection]} as ${sectionExportFormat.toUpperCase()}.`
+        : 'No rows are available to export for this section.'
+    );
+  }, [
+    activeSection,
+    exportAnalyticsReport,
+    exportAssignmentReport,
+    exportAttendanceReport,
+    exportComplaintReport,
+    exportNotificationsReport,
+    exportResolvedComplaintReport,
+    exportSettingsReport,
+    exportStaffReport,
+    exportSummaryReport,
+    sectionExportFormat,
+  ]);
 
   const menuItems = [
     { id: 'home', label: 'Dashboard', icon: FiHome },
@@ -1068,6 +1277,20 @@ const ADashboard = ({ onNavigateLanding }) => {
           </button>
           <h1 className="admin-page-title">Admin Dashboard</h1>
           <div className="admin-top-bar-right">
+            <div className="admin-top-export-controls">
+              <select
+                className="date-input admin-export-format-select"
+                value={sectionExportFormat}
+                onChange={(event) => setSectionExportFormat(event.target.value)}
+              >
+                {EXPORT_FORMAT_OPTIONS.map((option) => (
+                  <option key={`top-export-${option.value}`} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+              <button className="export-btn" onClick={exportCurrentSection}>
+                <FiDownload size={18} /> Export Current Section
+              </button>
+            </div>
             <button
               className="admin-refresh-btn"
               onClick={handleRefresh}
@@ -1266,9 +1489,14 @@ const ADashboard = ({ onNavigateLanding }) => {
                     <FiFilter size={18} />
                     Clear
                   </button>
-                  <button className="export-btn" onClick={exportComplaintReport}>
+                  <select className="date-input admin-export-format-select" value={sectionExportFormat} onChange={(event) => setSectionExportFormat(event.target.value)}>
+                    {EXPORT_FORMAT_OPTIONS.map((option) => (
+                      <option key={`complaint-export-${option.value}`} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                  <button className="export-btn" onClick={() => exportComplaintReport(sectionExportFormat)}>
                     <FiDownload size={18} />
-                    Export
+                    Export {sectionExportFormat.toUpperCase()}
                   </button>
                 </div>
               </div>
@@ -1433,9 +1661,14 @@ const ADashboard = ({ onNavigateLanding }) => {
                     <option value={20}>20 / page</option>
                     <option value={50}>50 / page</option>
                   </select>
-                  <button className="export-btn" onClick={exportResolvedComplaintReport}>
+                  <select className="date-input admin-export-format-select" value={sectionExportFormat} onChange={(event) => setSectionExportFormat(event.target.value)}>
+                    {EXPORT_FORMAT_OPTIONS.map((option) => (
+                      <option key={`resolved-export-${option.value}`} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                  <button className="export-btn" onClick={() => exportResolvedComplaintReport(sectionExportFormat)}>
                     <FiDownload size={18} />
-                    Export
+                    Export {sectionExportFormat.toUpperCase()}
                   </button>
                 </div>
               </div>
@@ -1597,8 +1830,13 @@ const ADashboard = ({ onNavigateLanding }) => {
                   <button className="btn-primary" onClick={handleAddSampleStaffAndAssign} disabled={bulkStaffActionLoading}>
                     <FiPlus size={16} /> {bulkStaffActionLoading ? 'Applying...' : 'Add Staff + Assign Complaints'}
                   </button>
-                  <button className="btn-primary" onClick={exportStaffReport}>
-                    <FiDownload size={16} /> Export Staff
+                  <select className="date-input admin-export-format-select" value={sectionExportFormat} onChange={(event) => setSectionExportFormat(event.target.value)}>
+                    {EXPORT_FORMAT_OPTIONS.map((option) => (
+                      <option key={`staff-export-${option.value}`} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                  <button className="btn-primary" onClick={() => exportStaffReport(sectionExportFormat)}>
+                    <FiDownload size={16} /> Export {sectionExportFormat.toUpperCase()}
                   </button>
                 </div>
               </div>
@@ -1752,7 +1990,17 @@ const ADashboard = ({ onNavigateLanding }) => {
             <div className="admin-section">
               <div className="admin-section-header">
                 <h1>Assign Complaints</h1>
-                <span className="admin-user-email">{assignSectionComplaints.length} active complaints</span>
+                <div className="filter-actions">
+                  <span className="admin-user-email">{assignSectionComplaints.length} active complaints</span>
+                  <select className="date-input admin-export-format-select" value={sectionExportFormat} onChange={(event) => setSectionExportFormat(event.target.value)}>
+                    {EXPORT_FORMAT_OPTIONS.map((option) => (
+                      <option key={`assign-export-${option.value}`} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                  <button className="export-btn" onClick={() => exportAssignmentReport(sectionExportFormat)}>
+                    <FiDownload size={18} /> Export {sectionExportFormat.toUpperCase()}
+                  </button>
+                </div>
               </div>
 
               {complaintsLoading && <p>Loading complaints...</p>}
@@ -1823,8 +2071,13 @@ const ADashboard = ({ onNavigateLanding }) => {
                   <button className="btn-primary" onClick={handleSaveAttendanceMarks} disabled={attendanceSaving}>
                     {attendanceSaving ? 'Saving...' : 'Mark Attendance'}
                   </button>
-                  <button className="export-btn" onClick={exportAttendanceReport}>
-                    <FiDownload size={18} /> Export Attendance
+                  <select className="date-input admin-export-format-select" value={sectionExportFormat} onChange={(event) => setSectionExportFormat(event.target.value)}>
+                    {EXPORT_FORMAT_OPTIONS.map((option) => (
+                      <option key={`attendance-export-${option.value}`} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                  <button className="export-btn" onClick={() => exportAttendanceReport(sectionExportFormat)}>
+                    <FiDownload size={18} /> Export {sectionExportFormat.toUpperCase()}
                   </button>
                 </div>
               </div>
@@ -1915,7 +2168,12 @@ const ADashboard = ({ onNavigateLanding }) => {
                       <option key={option} value={option}>{option === 'all' ? 'All Time' : `Last ${option.replace('d', ' Days')}`}</option>
                     ))}
                   </select>
-                  <button className="btn-primary" onClick={exportSummaryReport}>Generate Summary</button>
+                  <select className="date-input admin-export-format-select" value={sectionExportFormat} onChange={(event) => setSectionExportFormat(event.target.value)}>
+                    {EXPORT_FORMAT_OPTIONS.map((option) => (
+                      <option key={`report-export-${option.value}`} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                  <button className="btn-primary" onClick={() => exportSummaryReport(sectionExportFormat)}>Generate Summary</button>
                 </div>
               </div>
 
@@ -1936,7 +2194,7 @@ const ADashboard = ({ onNavigateLanding }) => {
                       <strong>{overdueComplaints.length}</strong>
                     </div>
                   </div>
-                  <button className="report-action-btn" onClick={exportComplaintReport}>Download CSV</button>
+                  <button className="report-action-btn" onClick={() => exportComplaintReport(sectionExportFormat, reportComplaints, 'Complaint Report', 'admin-complaint-report')}>Download {sectionExportFormat.toUpperCase()}</button>
                 </div>
 
                 <div className="report-card">
@@ -1955,7 +2213,7 @@ const ADashboard = ({ onNavigateLanding }) => {
                       <strong>{workerPerformance.filter((worker) => worker.isActive).length}</strong>
                     </div>
                   </div>
-                  <button className="report-action-btn" onClick={exportStaffReport}>Download CSV</button>
+                  <button className="report-action-btn" onClick={() => exportStaffReport(sectionExportFormat)}>Download {sectionExportFormat.toUpperCase()}</button>
                 </div>
 
                 <div className="report-card">
@@ -1974,7 +2232,7 @@ const ADashboard = ({ onNavigateLanding }) => {
                       <strong>{attendanceSummary.onLeave}</strong>
                     </div>
                   </div>
-                  <button className="report-action-btn" onClick={exportAttendanceReport}>Download CSV</button>
+                  <button className="report-action-btn" onClick={() => exportAttendanceReport(sectionExportFormat)}>Download {sectionExportFormat.toUpperCase()}</button>
                 </div>
 
                 <div className="report-card">
@@ -1993,7 +2251,7 @@ const ADashboard = ({ onNavigateLanding }) => {
                       <strong>{categoryData.length}</strong>
                     </div>
                   </div>
-                  <button className="report-action-btn" onClick={exportSummaryReport}>Download JSON</button>
+                  <button className="report-action-btn" onClick={() => exportSummaryReport(sectionExportFormat)}>Download {sectionExportFormat.toUpperCase()}</button>
                 </div>
               </div>
             </div>
@@ -2003,11 +2261,21 @@ const ADashboard = ({ onNavigateLanding }) => {
             <div className="admin-section">
               <div className="admin-section-header">
                 <h1>Advanced Analytics</h1>
-                <select className="period-select" value={reportPeriod} onChange={(event) => setReportPeriod(event.target.value)}>
-                  {REPORT_PERIOD_OPTIONS.map((option) => (
-                    <option key={option} value={option}>{option === 'all' ? 'All Time' : `Last ${option.replace('d', ' Days')}`}</option>
-                  ))}
-                </select>
+                <div className="filter-actions">
+                  <select className="period-select" value={reportPeriod} onChange={(event) => setReportPeriod(event.target.value)}>
+                    {REPORT_PERIOD_OPTIONS.map((option) => (
+                      <option key={option} value={option}>{option === 'all' ? 'All Time' : `Last ${option.replace('d', ' Days')}`}</option>
+                    ))}
+                  </select>
+                  <select className="date-input admin-export-format-select" value={sectionExportFormat} onChange={(event) => setSectionExportFormat(event.target.value)}>
+                    {EXPORT_FORMAT_OPTIONS.map((option) => (
+                      <option key={`analytics-export-${option.value}`} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                  <button className="export-btn" onClick={() => exportAnalyticsReport(sectionExportFormat)}>
+                    <FiDownload size={18} /> Export {sectionExportFormat.toUpperCase()}
+                  </button>
+                </div>
               </div>
 
               <div className="analytics-container">

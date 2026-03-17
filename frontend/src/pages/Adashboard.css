@@ -307,6 +307,12 @@
   gap: 16px;
 }
 
+.admin-top-export-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .admin-refresh-btn {
   background: none;
   border: none;
@@ -688,6 +694,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-export-format-select {
+  min-width: 110px;
 }
 
 .search-input {
