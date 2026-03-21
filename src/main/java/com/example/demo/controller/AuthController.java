@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*") // Allow cross-origin requests from React frontend
 public class AuthController {
 
     @Autowired

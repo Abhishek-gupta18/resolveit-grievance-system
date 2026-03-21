@@ -10,6 +10,7 @@ import {
   markStaffAttendance,
   updateAdminUser,
 } from '../services/adminService';
+import API_URL from '../services/apiConfig';
 import './Adashboard.css';
 import {
   FiHome, FiFileText, FiCheckCircle, FiBarChart2,
@@ -20,7 +21,6 @@ import {
   FiExternalLink,
 } from 'react-icons/fi';
 
-const API_BASE_URL = 'http://localhost:8008';
 const ADMIN_SETTINGS_KEY = 'resolveit-admin-settings';
 const ADMIN_ATTENDANCE_KEY = 'resolveit-admin-attendance';
 const ADMIN_NOTIFICATION_KEY = 'resolveit-admin-notification-state';
@@ -387,7 +387,7 @@ const ADashboard = ({ onNavigateLanding }) => {
     setComplaintsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/api/complaints/all`, {
+      const response = await fetch(`${API_URL}/api/complaints/all`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -468,7 +468,7 @@ const ADashboard = ({ onNavigateLanding }) => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/api/complaints/${complaintId}/status`, {
+      const response = await fetch(`${API_URL}/api/complaints/${complaintId}/status`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1551,7 +1551,7 @@ const ADashboard = ({ onNavigateLanding }) => {
                           {complaint.proofFileUrl ? (
                             <a
                               className="admin-proof-link"
-                              href={`${API_BASE_URL}${complaint.proofFileUrl}`}
+                              href={`${API_URL}${complaint.proofFileUrl}`}
                               target="_blank"
                               rel="noreferrer"
                             >
@@ -1723,7 +1723,7 @@ const ADashboard = ({ onNavigateLanding }) => {
                           {complaint.proofFileUrl ? (
                             <a
                               className="admin-proof-link"
-                              href={`${API_BASE_URL}${complaint.proofFileUrl}`}
+                              href={`${API_URL}${complaint.proofFileUrl}`}
                               target="_blank"
                               rel="noreferrer"
                             >

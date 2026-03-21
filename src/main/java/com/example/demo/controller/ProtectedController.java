@@ -14,7 +14,6 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/protected")
-@CrossOrigin(origins = "*")
 public class ProtectedController {
 
     /**

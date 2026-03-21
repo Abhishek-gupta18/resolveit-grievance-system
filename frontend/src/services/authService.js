@@ -1,4 +1,5 @@
 import axios from 'axios';
+import API_URL from './apiConfig';
 
 /**
  * Authentication Service for ResolveIT Grievance Management System
@@ -6,7 +7,7 @@ import axios from 'axios';
  */
 
 // Base URL for the backend API
-const API_BASE_URL = 'http://localhost:8008/api/auth';
+const API_BASE_URL = `${API_URL}/api/auth`;
 
 // Create axios instance with default configuration
 const api = axios.create({

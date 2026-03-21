@@ -1,4 +1,6 @@
-const STAFF_API_BASE_URL = 'http://localhost:8008/api/staff';
+import API_URL from './apiConfig';
+
+const STAFF_API_BASE_URL = `${API_URL}/api/staff`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');

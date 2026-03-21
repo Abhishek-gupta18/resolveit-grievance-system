@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { logout } from '../services/authService';
+import API_URL from '../services/apiConfig';
 import './Udashboard.css';
 import { 
   FiHome, FiFileText, FiCheckCircle, FiBarChart2, 
@@ -95,7 +96,7 @@ const UDashboard = ({ onNavigateLanding }) => {
   const fetchComplaints = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8008/api/complaints', {
+      const response = await fetch(`${API_URL}/api/complaints`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -151,7 +152,7 @@ const UDashboard = ({ onNavigateLanding }) => {
         multipartData.append('proofFile', proofFile);
       }
 
-      const response = await fetch('http://localhost:8008/api/complaints/with-proof', {
+      const response = await fetch(`${API_URL}/api/complaints/with-proof`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -642,7 +643,7 @@ const UDashboard = ({ onNavigateLanding }) => {
                         <div className="proof-file-row">
                           <span>Proof:</span>
                           <a
-                            href={`http://localhost:8008${complaint.proofFileUrl}`}
+                            href={`${API_URL}${complaint.proofFileUrl}`}
                             target="_blank"
                             rel="noreferrer"
                             className="proof-file-link"
