@@ -66,7 +66,7 @@ public class ComplaintService {
     @Autowired
     private EscalationRepository escalationRepository;
 
-    @Value("${app.upload.dir:uploads/complaint-proofs}")
+    @Value("${app.upload.dir:ResolveIT/uploads/complaint-proofs}")
     private String uploadDir;
 
     public ComplaintResponse createComplaint(ComplaintRequest request, String authenticatedEmail) {
@@ -535,7 +535,7 @@ public class ComplaintService {
                     "Unsupported file type. Allowed: jpg, jpeg, png, pdf, doc, docx");
         }
 
-        Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+        Path uploadPath = resolveUploadPath();
         try {
             Files.createDirectories(uploadPath);
             String storedName = UUID.randomUUID() + "_" + originalName.replaceAll("[^a-zA-Z0-9._-]", "_");
@@ -546,8 +546,21 @@ public class ComplaintService {
             complaint.setProofFileType(proofFile.getContentType());
             complaint.setProofFilePath(targetPath.toString());
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to store proof file");
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Failed to store proof file at " + uploadPath + ": " + e.getMessage()
+            );
         }
+    }
+
+    private Path resolveUploadPath() {
+        Path configuredPath = Paths.get(uploadDir).normalize();
+        if (configuredPath.isAbsolute()) {
+            return configuredPath;
+        }
+
+        // Relative paths should not depend on process working directory.
+        return Paths.get(System.getProperty("user.home"), uploadDir).toAbsolutePath().normalize();
     }
 
     private String getExtension(String fileName) {

@@ -8,12 +8,12 @@ USE students_db;
 
 -- Insert new admin user
 -- Password: admin123
--- BCrypt Hash: $2a$10$slYQmyNdGzin7olVyJCL0OPST9/PgBkqquzi.Hy1yK1J0D0AI2afu
+-- BCrypt Hash: $2a$10$QmoE2OAOK2k2tAieVjzlzuxS3vCMWkD6dthMWJ/GwkSW6rta.kzHW
 INSERT INTO users (name, email, password, role, is_active, created_at, updated_at) 
 VALUES (
   'Admin User',
   'admin@resolve.com',
-  '$2a$10$slYQmyNdGzin7olVyJCL0OPST9/PgBkqquzi.Hy1yK1J0D0AI2afu',
+  '$2a$10$QmoE2OAOK2k2tAieVjzlzuxS3vCMWkD6dthMWJ/GwkSW6rta.kzHW',
   'ADMIN',
   true,
   NOW(),
@@ -28,7 +28,7 @@ SELECT id, name, email, role, is_active FROM users WHERE email = 'admin@resolve.
 -- VALUES (
 --   'Super Admin',
 --   'superadmin@resolve.com',
---   '$2a$10$slYQmyNdGzin7olVyJCL0OPST9/PgBkqquzi.Hy1yK1J0D0AI2afu',
+--   '$2a$10$QmoE2OAOK2k2tAieVjzlzuxS3vCMWkD6dthMWJ/GwkSW6rta.kzHW',
 --   'ADMIN',
 --   true,
 --   NOW(),
@@ -40,7 +40,7 @@ SELECT id, name, email, role, is_active FROM users WHERE email = 'admin@resolve.
 -- VALUES (
 --   'Test User',
 --   'user@resolve.com',
---   '$2a$10$slYQmyNdGzin7olVyJCL0OPST9/PgBkqquzi.Hy1yK1J0D0AI2afu',
+--   '$2a$10$QmoE2OAOK2k2tAieVjzlzuxS3vCMWkD6dthMWJ/GwkSW6rta.kzHW',
 --   'USER',
 --   true,
 --   NOW(),
