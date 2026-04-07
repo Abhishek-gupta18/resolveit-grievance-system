@@ -7,17 +7,24 @@
 # Make sure MySQL is running on port 3306
 # Create database if not exists:
 mysql -u root -p
-CREATE DATABASE students_db;
+CREATE DATABASE resolveit_auth;
 exit;
 ```
 
 ### Step 2: Start Backend Server
 ```bash
 # Navigate to project root
-cd "c:\Users\Asus\OneDrive\Desktop\rajjo bday\demo"
+cd "d:\Backup\prooo\demo"
 
 # Run Spring Boot application
-mvn spring-boot:run
+./mvnw.cmd spring-boot:run
+```
+
+If Maven fails with Access is denied while writing target/classes/application.properties, start the packaged jar instead:
+
+```bash
+cd "d:\Backup\prooo\demo"
+java -jar target/demo-0.0.1-SNAPSHOT.jar
 ```
 
 Wait for the message: **"Started MavennnApplication in X seconds"**
@@ -28,13 +35,16 @@ Backend is now running on: **http://localhost:8008**
 ```bash
 # Open a new terminal
 # Navigate to frontend directory
-cd "c:\Users\Asus\OneDrive\Desktop\rajjo bday\demo\frontend"
-
-# Set execution policy (if needed)
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+cd "d:\Backup\prooo\demo\frontend"
 
 # Start React app
 npm start
+```
+
+If PowerShell blocks npm with npm.ps1 cannot be loaded because running scripts is disabled, use:
+
+```bash
+cmd /c "cd frontend && npm start"
 ```
 
 Frontend is now running on: **http://localhost:3000**
@@ -122,7 +132,7 @@ Authorization: Bearer YOUR_TOKEN_HERE
 
 ### Verify User Created in MySQL
 ```sql
-USE students_db;
+USE resolveit_auth;
 
 -- View users table
 SELECT * FROM users;
@@ -171,16 +181,16 @@ id | name      | email              | password (encrypted)        | role | is_ac
 ### Backend
 ```bash
 # Clean and compile
-mvn clean compile
+./mvnw.cmd clean compile
 
 # Run tests
-mvn test
+./mvnw.cmd test
 
 # Package application
-mvn package
+./mvnw.cmd package
 
 # Run application
-mvn spring-boot:run
+./mvnw.cmd spring-boot:run
 ```
 
 ### Frontend
@@ -206,7 +216,7 @@ npm test
 |---------|-------|
 | Backend Port | 8008 |
 | Frontend Port | 3000 |
-| Database | students_db |
+| Database | resolveit_auth |
 | Database Port | 3306 |
 | JWT Expiration | 1 hour |
 | Default Role | USER |
@@ -218,13 +228,18 @@ npm test
 
 ### Backend won't start
 - ✅ Check MySQL is running
-- ✅ Verify database `students_db` exists
+- ✅ Verify database resolveit_auth exists
 - ✅ Check port 8008 is not in use
+- ✅ If Maven fails with Access is denied in target/classes, run java -jar target/demo-0.0.1-SNAPSHOT.jar
 
 ### Frontend won't start
 - ✅ Delete `node_modules` and run `npm install`
 - ✅ Check port 3000 is not in use
-- ✅ Run: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
+- ✅ If npm.ps1 is blocked, run: cmd /c "cd frontend && npm start"
+
+### Proxy error on login
+- ✅ If you see Could not proxy request /api/auth/login ... ECONNREFUSED, backend is not reachable
+- ✅ Start backend and confirm it is running on http://localhost:8008
 
 ### Login fails
 - ✅ Check backend is running

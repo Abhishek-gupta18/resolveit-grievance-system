@@ -11,7 +11,7 @@
 mysql -u root -p
 
 # Use the database
-USE students_db;
+USE resolveit_auth;
 
 # Run the SQL command
 INSERT INTO users (name, email, password, role, is_active, created_at, updated_at) 
@@ -33,10 +33,10 @@ SELECT id, name, email, role, is_active FROM users WHERE role = 'ADMIN';
 
 ```bash
 # Navigate to project root
-cd c:\Users\Asus\OneDrive\Desktop\rajjo bday\demo
+cd d:\Backup\prooo\demo
 
 # Run the SQL script
-mysql -u root -p students_db < CREATE_ADMIN_USER.sql
+mysql -u root -p resolveit_auth < CREATE_ADMIN_USER.sql
 ```
 
 **Option C: Using MySQL Workbench**
@@ -71,8 +71,8 @@ SELECT id, name, email, role, is_active, created_at FROM users WHERE email = 'ad
 # If backend is running, stop it (Ctrl + C)
 
 # In the project root directory, run:
-mvn clean install
-mvn spring-boot:run
+./mvnw.cmd clean install
+./mvnw.cmd spring-boot:run
 ```
 
 **Wait for message:** `Started MavennnApplication in X seconds`
@@ -100,10 +100,10 @@ mvn spring-boot:run
 **Solution:**
 ```bash
 # Check if admin user exists
-mysql -u root -p -e "USE students_db; SELECT * FROM users WHERE email = 'admin@resolve.com';"
+mysql -u root -p -e "USE resolveit_auth; SELECT * FROM users WHERE email = 'admin@resolve.com';"
 
 # If no result, create user again using the SQL script
-mysql -u root -p students_db < CREATE_ADMIN_USER.sql
+mysql -u root -p resolveit_auth < CREATE_ADMIN_USER.sql
 ```
 
 ---
@@ -158,10 +158,10 @@ UPDATE users SET is_active = true WHERE email = 'admin@resolve.com';
 **Solution:**
 ```bash
 # List all users
-mysql -u root -p -e "USE students_db; SELECT id, email, role FROM users;"
+mysql -u root -p -e "USE resolveit_auth; SELECT id, email, role FROM users;"
 
 # Create admin if not exists
-mysql -u root -p students_db < CREATE_ADMIN_USER.sql
+mysql -u root -p resolveit_auth < CREATE_ADMIN_USER.sql
 ```
 
 ---
@@ -302,7 +302,7 @@ Before attempting admin login, verify these:
 3. **Check Database Connection:**
    ```sql
    SHOW DATABASES;
-   USE students_db;
+   USE resolveit_auth;
    SHOW TABLES;
    SELECT COUNT(*) FROM users;
    ```
@@ -310,7 +310,7 @@ Before attempting admin login, verify these:
 4. **Check Application Properties:**
    - Verify `application.properties` has correct database credentials:
    ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/students_db
+   spring.datasource.url=jdbc:mysql://localhost:3306/resolveit_auth
    spring.datasource.username=root
    spring.datasource.password=YOUR_PASSWORD
    ```

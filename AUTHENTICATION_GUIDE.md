@@ -211,26 +211,26 @@ if (isAuthenticated()) {
 
 2. **Create Database**
    ```sql
-   CREATE DATABASE students_db;
+   CREATE DATABASE resolveit_auth;
    ```
 
 3. **Update Database Configuration** (if needed)
    Edit `src/main/resources/application.properties`:
    ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/students_db
+   spring.datasource.url=jdbc:mysql://localhost:3306/resolveit_auth
    spring.datasource.username=root
    spring.datasource.password=YOUR_PASSWORD
    ```
 
 4. **Install Dependencies**
    ```bash
-   cd "c:\Users\Asus\OneDrive\Desktop\rajjo bday\demo"
-   mvn clean install
+   cd "d:\Backup\prooo\demo"
+   ./mvnw.cmd clean install
    ```
 
 5. **Run Spring Boot Application**
    ```bash
-   mvn spring-boot:run
+   ./mvnw.cmd spring-boot:run
    ```
    
    Or run from IDE:
@@ -243,7 +243,7 @@ if (isAuthenticated()) {
 
 1. **Navigate to Frontend Directory**
    ```bash
-   cd "c:\Users\Asus\OneDrive\Desktop\rajjo bday\demo\frontend"
+   cd "d:\Backup\prooo\demo\frontend"
    ```
 
 2. **Install Dependencies**
@@ -418,15 +418,15 @@ To change user role, update the database directly or create an admin endpoint.
 2. **Database Connection Error**
    - Verify MySQL is running
    - Check database credentials in application.properties
-   - Ensure database `students_db` exists
+   - Ensure database `resolveit_auth` exists
 
 3. **JWT Token Invalid**
    - Token may have expired (default: 1 hour)
    - Login again to get a new token
 
 4. **npm install fails**
-   - Run: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
-   - Then retry: `npm install`
+   - If PowerShell blocks npm scripts, run frontend with `cmd /c "cd frontend && npm start"`
+   - Or enable script execution for your user profile and retry
 
 5. **Port Already in Use**
    - Backend (8008): Change `server.port` in application.properties

@@ -149,16 +149,16 @@ The system is **production-ready** and fully functional.
 ### Backend Setup
 ```bash
 # 1. Ensure MySQL is running and database exists
-CREATE DATABASE students_db;
+CREATE DATABASE resolveit_auth;
 
 # 2. Navigate to project root
-cd "c:\Users\Asus\OneDrive\Desktop\rajjo bday\demo"
+cd "d:\Backup\prooo\demo"
 
 # 3. Install dependencies (if not using IDE)
-mvn clean install
+./mvnw.cmd clean install
 
 # 4. Run Spring Boot
-mvn spring-boot:run
+./mvnw.cmd spring-boot:run
 ```
 
 Server runs on: **http://localhost:8008**
@@ -166,7 +166,7 @@ Server runs on: **http://localhost:8008**
 ### Frontend Setup
 ```bash
 # 1. Navigate to frontend directory
-cd "c:\Users\Asus\OneDrive\Desktop\rajjo bday\demo\frontend"
+cd "d:\Backup\prooo\demo\frontend"
 
 # 2. Install dependencies (if first time)
 npm install
@@ -494,7 +494,7 @@ This implementation demonstrates:
 
 1. Read **QUICK_START.md** (5 minutes)
 2. Follow MySQL setup
-3. Start backend (mvn spring-boot:run)
+3. Start backend (./mvnw.cmd spring-boot:run)
 4. Start frontend (npm start)
 5. Test in browser
 6. Reference documentation as needed

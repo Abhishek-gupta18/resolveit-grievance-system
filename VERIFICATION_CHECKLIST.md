@@ -25,7 +25,7 @@ Use this checklist to verify all components are correctly installed and configur
 - [ ] MySQL Server running
   ```bash
   mysql -u root -p
-  CREATE DATABASE students_db;
+  CREATE DATABASE resolveit_auth;
   ```
 
 ---
@@ -143,11 +143,11 @@ Use this checklist to verify all components are correctly installed and configur
 
 ## 🗄️ Database Verification
 
-- [ ] Database created: `students_db`
+- [ ] Database created: `resolveit_auth`
 
 - [ ] After first run, verify users table:
   ```sql
-  USE students_db;
+  USE resolveit_auth;
   DESCRIBE users;
   ```
 
@@ -169,12 +169,12 @@ Use this checklist to verify all components are correctly installed and configur
 
 - [ ] Navigate to project root directory
   ```bash
-  cd "c:\Users\Asus\OneDrive\Desktop\rajjo bday\demo"
+  cd "d:\Backup\prooo\demo"
   ```
 
 - [ ] Run Spring Boot
   ```bash
-  mvn spring-boot:run
+  ./mvnw.cmd spring-boot:run
   ```
 
 - [ ] Wait for startup message:
@@ -196,12 +196,12 @@ Use this checklist to verify all components are correctly installed and configur
 
 - [ ] Navigate to frontend directory
   ```bash
-  cd "c:\Users\Asus\OneDrive\Desktop\rajjo bday\demo\frontend"
+  cd "d:\Backup\prooo\demo\frontend"
   ```
 
-- [ ] Set execution policy (if needed)
+- [ ] If PowerShell blocks npm scripts, start frontend with:
   ```bash
-  Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+  cmd /c "cd frontend && npm start"
   ```
 
 - [ ] Start React
@@ -341,7 +341,7 @@ If tests fail, verify:
 
 - [ ] Backend compilation errors?
   ```bash
-  mvn clean compile
+  ./mvnw.cmd clean compile
   ```
 
 - [ ] Port conflict?
@@ -350,7 +350,7 @@ If tests fail, verify:
 
 - [ ] Database connection error?
   - [ ] MySQL running? `services.msc`
-  - [ ] Database `students_db` exists?
+  - [ ] Database `resolveit_auth` exists?
   - [ ] Credentials correct in application.properties?
 
 - [ ] Frontend axios not installed?

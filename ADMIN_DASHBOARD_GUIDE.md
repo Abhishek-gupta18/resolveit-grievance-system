@@ -12,7 +12,7 @@ To create an admin user directly in the MySQL database:
 
 ```sql
 -- Connect to your MySQL database
-USE students_db;
+USE resolveit_auth;
 
 -- Insert admin user (password is BCrypt encrypted in the actual database)
 INSERT INTO users (name, email, password, role, is_active, created_at, updated_at) 

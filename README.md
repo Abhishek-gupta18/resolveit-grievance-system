@@ -26,21 +26,34 @@ Start here based on your needs:
 # Ensure MySQL is running
 # Create database
 mysql -u root -p
-CREATE DATABASE students_db;
+CREATE DATABASE resolveit_auth;
 exit;
 ```
 
 ### 2. Start Backend
 ```bash
-cd "c:\Users\Asus\OneDrive\Desktop\rajjo bday\demo"
-mvn spring-boot:run
+cd "d:\Backup\prooo\demo"
+./mvnw.cmd spring-boot:run
+```
+
+If Maven fails with `Access is denied` for `target/classes/application.properties`, run the packaged jar instead:
+
+```bash
+cd "d:\Backup\prooo\demo"
+java -jar target/demo-0.0.1-SNAPSHOT.jar
 ```
 
 ### 3. Start Frontend
 ```bash
 # In new terminal
-cd "c:\Users\Asus\OneDrive\Desktop\rajjo bday\demo\frontend"
+cd "d:\Backup\prooo\demo\frontend"
 npm start
+```
+
+On Windows PowerShell, if `npm.ps1 cannot be loaded because running scripts is disabled`, use:
+
+```bash
+cmd /c "cd frontend && npm start"
 ```
 
 ### 4. Test!
@@ -326,6 +339,7 @@ public ResponseEntity<?> getAdminData() {
 |---------|----------|
 | Port 8008 already in use | Change port in `application.properties` |
 | Database connection error | Check MySQL is running, verify credentials |
+| `Access is denied` while copying `application.properties` to `target/classes` | Run backend using `java -jar target/demo-0.0.1-SNAPSHOT.jar` |
 | Compilation error | Run `mvn clean compile` |
 | Beans not wiring | Check annotations (@Service, @Controller, @Repository) |
 
@@ -333,14 +347,15 @@ public ResponseEntity<?> getAdminData() {
 | Problem | Solution |
 |---------|----------|
 | Port 3000 already in use | Kill process or use different port |
-| npm install fails | Run with execution policy bypass |
+| PowerShell blocks npm (`npm.ps1` execution policy error) | Start frontend via `cmd /c "cd frontend && npm start"` or allow script execution for current user |
+| Proxy error: `Could not proxy request /api/auth/login ... ECONNREFUSED` | Ensure backend is running on `http://localhost:8008` |
 | CORS errors | Verify backend is running, check SecurityConfig |
 | Token not sending | Check axios interceptor in authService |
 
 ### Database Issues
 | Problem | Solution |
 |---------|----------|
-| Database doesn't exist | Create it: `CREATE DATABASE students_db;` |
+| Database doesn't exist | Create it: `CREATE DATABASE resolveit_auth;` |
 | Table doesn't exist | Run backend (Hibernate auto-creates) |
 | Wrong password | Check application.properties credentials |
 

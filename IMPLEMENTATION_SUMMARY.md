@@ -203,20 +203,20 @@ CREATE TABLE users (
 
 ### Backend
 ```bash
-cd "c:\Users\Asus\OneDrive\Desktop\rajjo bday\demo"
-mvn spring-boot:run
+cd "d:\Backup\prooo\demo"
+./mvnw.cmd spring-boot:run
 ```
 
 ### Frontend
 ```bash
-cd "c:\Users\Asus\OneDrive\Desktop\rajjo bday\demo\frontend"
+cd "d:\Backup\prooo\demo\frontend"
 npm start
 ```
 
 ### Access Points
 - Backend API: http://localhost:8008
 - Frontend App: http://localhost:3000
-- MySQL Database: localhost:3306/students_db
+- MySQL Database: localhost:3306/resolveit_auth
 
 ---
 
@@ -346,8 +346,8 @@ demo/
 | MySQL connection error | Verify MySQL is running, check credentials |
 | Token invalid error | Token expired (1 hour), login again |
 | CORS error | Check backend is running, verify frontend URL in SecurityConfig |
-| npm: execution policy error | Run: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` |
-| Backend compilation error | Run `mvn clean compile` to clear cache |
+| npm: execution policy error | Run frontend using `cmd /c "cd frontend && npm start"` |
+| Backend compilation error | Run `./mvnw.cmd clean compile` to clear cache |
 | Frontend build error | Delete node_modules and run `npm install` again |
 
 ---
