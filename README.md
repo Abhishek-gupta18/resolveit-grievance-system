@@ -85,12 +85,12 @@ cmd /c "cd frontend && npm start"
 ✅ Example Admin-Only Endpoints
 
 ### Frontend
-✅ React Login/Register Form
-✅ Form Validation
+✅ React Login/Register Form![alt text](<WhatsApp Image 2026-03-25 at 12.23.32 AM.jpeg>)
+✅ Form Validation![alt text](<WhatsApp Image 2026-03-25 at 12.23.29 AM.jpeg>)
 ✅ API Integration (Axios)
 ✅ JWT Token Management
-✅ Local Storage for tokens
-✅ User Session Handling
+✅ Local Storage for tokens![alt text](<WhatsApp Image 2026-03-25 at 12.23.15 AM.jpeg>)
+✅ User Session Handling![alt text](<WhatsApp Image 2026-03-25 at 12.23.10 AM.jpeg>)
 ✅ Loading & Error States
 
 ### Database
