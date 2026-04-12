@@ -2,6 +2,11 @@
 
 ## Step-by-Step Setup (5 minutes)
 
+### One Click Startup in VS Code (Recommended)
+Use the task **Run Full Stack app** from **Terminal -> Run Task**.
+
+This starts backend and frontend together in one go.
+
 ### Step 1: Start MySQL Database
 ```bash
 # Make sure MySQL is running on port 3306
@@ -20,13 +25,6 @@ cd "d:\Backup\prooo\demo"
 ./mvnw.cmd spring-boot:run
 ```
 
-If Maven fails with Access is denied while writing target/classes/application.properties, start the packaged jar instead:
-
-```bash
-cd "d:\Backup\prooo\demo"
-java -jar target/demo-0.0.1-SNAPSHOT.jar
-```
-
 Wait for the message: **"Started MavennnApplication in X seconds"**
 
 Backend is now running on: **http://localhost:8008**
@@ -38,7 +36,7 @@ Backend is now running on: **http://localhost:8008**
 cd "d:\Backup\prooo\demo\frontend"
 
 # Start React app
-npm start
+npm.cmd start
 ```
 
 If PowerShell blocks npm with npm.ps1 cannot be loaded because running scripts is disabled, use:

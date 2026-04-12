@@ -176,24 +176,50 @@ const UDashboard = ({ onNavigateLanding }) => {
 
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        setMessage('❌ Session expired. Please log in again.');
+        onNavigateLanding();
+        return;
+      }
+
       const combinedDescription = `${formData.title.trim()}: ${formData.description.trim()}`;
       const multipartData = new FormData();
       multipartData.append('category', formData.category);
       multipartData.append('description', combinedDescription);
       multipartData.append('urgency', formData.priority);
       multipartData.append('priority', formData.priority);
-      multipartData.append('userId', user.userId);
+      if (user?.userId) {
+        multipartData.append('userId', user.userId);
+      }
       if (proofFile) {
         multipartData.append('proofFile', proofFile);
       }
 
-      const response = await fetch(`${API_URL}/api/complaints/with-proof`, {
+      let response = await fetch(`${API_URL}/api/complaints/with-proof`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
         },
         body: multipartData,
       });
+
+      // Backward compatibility: older backend builds may not expose /with-proof.
+      if (response.status === 404) {
+        response = await fetch(`${API_URL}/api/complaints`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: user?.userId ? Number(user.userId) : undefined,
+            category: formData.category,
+            description: combinedDescription,
+            urgency: formData.priority,
+            priority: formData.priority,
+          }),
+        });
+      }
 
       if (response.ok) {
         const savedComplaint = await response.json();

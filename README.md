@@ -36,13 +36,6 @@ cd "d:\Backup\prooo\demo"
 ./mvnw.cmd spring-boot:run
 ```
 
-If Maven fails with `Access is denied` for `target/classes/application.properties`, run the packaged jar instead:
-
-```bash
-cd "d:\Backup\prooo\demo"
-java -jar target/demo-0.0.1-SNAPSHOT.jar
-```
-
 ### 3. Start Frontend
 ```bash
 # In new terminal
