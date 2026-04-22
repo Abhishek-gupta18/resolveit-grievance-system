@@ -19,6 +19,23 @@ Start here based on your needs:
 
 ---
 
+## 📅 Project Timeline
+
+Timeline starts from the first repo commit on 2026-03-14. Day numbers are counted from that point.
+
+| Date | Day No. | What was done | Files touched |
+|------|---------|---------------|---------------|
+| 2026-03-14 | Day 1 | Initial project scaffold and baseline app structure were committed. | Core backend, frontend, docs, SQL scripts, and build files |
+| 2026-03-17 | Day 4 | Login flow and JWT handling were improved on the frontend build/output side. | `frontend/src/pages/Adashboard.jsx`, `frontend/src/pages/Adashboard.css`, `frontend/package.json` |
+| 2026-03-21 | Day 8 | Authentication flow and backend security/configuration were refined. | `src/main/java/com/example/demo/config/SecurityConfig.java`, `src/main/java/com/example/demo/controller/*`, `src/main/resources/application.properties`, `frontend/src/services/*` |
+| 2026-03-23 | Day 10 | Auth service and login-related behavior were updated again for the next iteration. | `src/main/java/com/example/demo/controller/AuthController.java`, `src/main/java/com/example/demo/service/AuthService.java`, `frontend/src/services/authService.js`, `frontend/src/pages/*` |
+| 2026-03-24 | Day 11 | A new project asset was added. | `Kormos ai.jpg` |
+| 2026-03-30 | Day 17 | Repository licensing was finalized. | `LICENSE` |
+| 2026-04-08 | Day 26 | Admin setup, database helpers, documentation, and the main README were expanded. | `CREATE_ADMIN_USER.sql`, `CREATE_SAMPLE_STAFF_USERS.sql`, `src/main/resources/application.properties`, `README.md`, `QUICK_START.md`, `AUTHENTICATION_GUIDE.md`, `IMPLEMENTATION_SUMMARY.md`, `PROJECT_COMPLETION_REPORT.md`, `VERIFICATION_CHECKLIST.md` |
+| 2026-04-12 | Day 30 | Quick start instructions, README guidance, and the user dashboard were updated. | `QUICK_START.md`, `README.md`, `frontend/src/pages/Udashboard.jsx` |
+
+---
+
 ## 🚀 Quick Start (5 minutes)
 
 ### 1. Start MySQL
