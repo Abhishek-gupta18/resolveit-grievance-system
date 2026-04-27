@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 
@@ -9,6 +9,35 @@ import './App.css';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('landing');
+
+  useEffect(() => {
+    const CLICK_FEEDBACK_CLASS = 'btn-click-feedback';
+
+    const handleButtonClickFeedback = (event) => {
+      const clickedButton = event.target instanceof Element
+        ? event.target.closest('button')
+        : null;
+
+      if (!clickedButton || clickedButton.disabled) {
+        return;
+      }
+
+      clickedButton.classList.remove(CLICK_FEEDBACK_CLASS);
+      // Force reflow so rapid repeated clicks replay the animation every time.
+      void clickedButton.offsetWidth;
+      clickedButton.classList.add(CLICK_FEEDBACK_CLASS);
+
+      window.setTimeout(() => {
+        clickedButton.classList.remove(CLICK_FEEDBACK_CLASS);
+      }, 520);
+    };
+
+    document.addEventListener('click', handleButtonClickFeedback);
+
+    return () => {
+      document.removeEventListener('click', handleButtonClickFeedback);
+    };
+  }, []);
 
   const handleNavigateLogin = () => {
     setCurrentPage('login');

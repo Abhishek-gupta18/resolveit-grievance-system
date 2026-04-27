@@ -331,6 +331,50 @@ const downloadPdf = (fileName, title, rows) => {
   doc.save(fileName);
 };
 
+const extractFileNameFromDisposition = (contentDisposition) => {
+  if (!contentDisposition) {
+    return null;
+  }
+
+  const utf8Match = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+  if (utf8Match?.[1]) {
+    return decodeURIComponent(utf8Match[1]);
+  }
+
+  const asciiMatch = contentDisposition.match(/filename="?([^";]+)"?/i);
+  return asciiMatch?.[1] || null;
+};
+
+const downloadProofFile = async (proofFileUrl) => {
+  if (!proofFileUrl) {
+    return;
+  }
+
+  const token = localStorage.getItem('token');
+  const response = await fetch(`${API_URL}${proofFileUrl}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to download proof file (${response.status})`);
+  }
+
+  const blob = await response.blob();
+  const contentDisposition = response.headers.get('content-disposition');
+  const derivedName = extractFileNameFromDisposition(contentDisposition);
+  const fallbackName = decodeURIComponent((proofFileUrl.split('?')[0].split('/').pop() || '').trim()) || `proof-${Date.now()}`;
+  const fileName = derivedName || fallbackName;
+
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = objectUrl;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(objectUrl);
+};
+
 const exportRows = ({ fileName, sheetName, title, rows }, format) => {
   if (!rows || rows.length <= 1) {
     return false;
@@ -1626,8 +1670,15 @@ const ADashboard = ({ onNavigateLanding }) => {
                             <a
                               className="admin-proof-link"
                               href={`${API_URL}${complaint.proofFileUrl}`}
-                              target="_blank"
-                              rel="noreferrer"
+                              onClick={async (event) => {
+                                event.preventDefault();
+                                try {
+                                  await downloadProofFile(complaint.proofFileUrl);
+                                } catch (error) {
+                                  console.error('Failed to download proof file', error);
+                                  window.alert('Unable to download proof file right now. Please try again.');
+                                }
+                              }}
                             >
                               <FiExternalLink size={14} />
                               Open
@@ -1798,8 +1849,15 @@ const ADashboard = ({ onNavigateLanding }) => {
                             <a
                               className="admin-proof-link"
                               href={`${API_URL}${complaint.proofFileUrl}`}
-                              target="_blank"
-                              rel="noreferrer"
+                              onClick={async (event) => {
+                                event.preventDefault();
+                                try {
+                                  await downloadProofFile(complaint.proofFileUrl);
+                                } catch (error) {
+                                  console.error('Failed to download proof file', error);
+                                  window.alert('Unable to download proof file right now. Please try again.');
+                                }
+                              }}
                             >
                               <FiExternalLink size={14} />
                               Open

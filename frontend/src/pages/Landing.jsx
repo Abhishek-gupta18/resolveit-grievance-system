@@ -5,7 +5,7 @@ const Landing = ({ onNavigateLogin }) => {
   return (
     <div className="landing-container">
       <header className="landing-header">
-        <div className="brand">Smart Grievance Management System😎😎</div>
+        <div className="brand">Smart Grievance Management System</div>
         <button className="btn btn-outline"  onClick={onNavigateLogin}>Login / Register</button>
       </header>
 
