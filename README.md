@@ -619,6 +619,15 @@ cmd /c "cd frontend && npm start"
 
 ---
 
+## 🎬 Demo Video
+
+<p align="center">
+    <video width="640" controls>
+        <source src="Video%20Project%205.mp4" type="video/mp4">
+        Your browser does not support the video tag. You can also watch it directly: [Play video](./Video%20Project%205.mp4)
+    </video>
+</p>
+
 ## 📁 Project Structure
 
 ```
