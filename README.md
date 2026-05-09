@@ -485,6 +485,41 @@ Your ResolveIT Smart Grievance Management System now has:
 
 ---
 
+## 🌟 Featured Project Showcase
+
+### Shared on LinkedIn
+
+This **ResolveIT Smart Grievance Management System** was shared and recognized on LinkedIn as a successful internship project! Here's what was highlighted:
+
+![LinkedIn Post - ResolveIT Grievance Management System](./screenshots/linkedin-grievance-system-post.png)
+
+**Project Highlights from the Post:**
+- ✨ Full-stack development with React.js, Spring Boot, MySQL, and JWT Authentication
+- 🔐 Role-based dashboards for Users, Staff, and Admins
+- 🛡️ Secure JWT-based authentication and authorization
+- 📊 Real-time complaint tracking and status updates
+- 🔄 Complaint escalation and management workflow
+- 🎯 Professional backend APIs built with Spring Security
+
+**Tech Stack Featured:**
+- **React.js** - Frontend framework
+- **Spring Boot** - Backend framework  
+- **MySQL** - Database
+- **JWT Authentication** - Secure token-based authentication
+- **RESTful APIs** - Backend integration
+
+**Key Learning Outcomes:**
+- Full-stack development experience
+- REST API integration and design
+- Authentication & security implementation
+- Database design and backend architecture
+- Git/GitHub collaboration and version control
+- Professional software engineering practices
+
+This project became a great learning experience thanks to amazing teamwork, problem-solving, and collaborative effort throughout the development journey! 🚀
+
+---
+
 ## 📖 Documentation Files
 
 All documentation is in the root directory:
