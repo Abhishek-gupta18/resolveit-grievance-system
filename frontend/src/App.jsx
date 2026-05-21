@@ -7,8 +7,9 @@ import ADashboard from './pages/Adashboard';
 import SDashboard from './pages/SDashboard';
 import './App.css';
 
-function App() {
+function App({ backendAvailable = true }) {
   const [currentPage, setCurrentPage] = useState('landing');
+  const [notice, setNotice] = useState('');
 
   useEffect(() => {
     const CLICK_FEEDBACK_CLASS = 'btn-click-feedback';
@@ -40,6 +41,13 @@ function App() {
   }, []);
 
   const handleNavigateLogin = () => {
+    if (!backendAvailable) {
+      setNotice('Backend is not available. The full app requires the backend to be deployed.');
+      setCurrentPage('landing');
+      return;
+    }
+
+    setNotice('');
     setCurrentPage('login');
   };
 
@@ -48,6 +56,14 @@ function App() {
   };
 
   const handleNavigateDashboard = () => {
+    if (!backendAvailable) {
+      setNotice('Backend is not available. Dashboards require the backend.');
+      setCurrentPage('landing');
+      return;
+    }
+
+    setNotice('');
+
     const userRole = (localStorage.getItem('userRole') || '').toUpperCase();
     const userEmail = (localStorage.getItem('userEmail') || '').toLowerCase();
 
@@ -82,6 +98,9 @@ function App() {
 
   return (
     <div className="App">
+      {notice && (
+        <div style={{background:'#fff3cd',color:'#856404',padding:'10px',textAlign:'center'}}>{notice}</div>
+      )}
       {currentPage === 'landing' && (
         <Landing onNavigateLogin={handleNavigateLogin} />
       )}
