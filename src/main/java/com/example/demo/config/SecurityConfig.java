@@ -96,7 +96,7 @@ public class SecurityConfig {
             .filter(origin -> !origin.isEmpty())
             .collect(Collectors.toList());
 
-        configuration.setAllowedOrigins(origins);
+        configuration.setAllowedOriginPatterns(origins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Origin"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
